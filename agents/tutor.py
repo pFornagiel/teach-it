@@ -1,6 +1,6 @@
 from langchain_openai import ChatOpenAI
 from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 
 def build_tutor(vectorstore):
     llm = ChatOpenAI(

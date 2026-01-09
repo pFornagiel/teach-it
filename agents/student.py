@@ -1,7 +1,7 @@
 import json
 import logging
 from langchain_openai import ChatOpenAI
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 # from backend.app import app  # Removed to avoid circular import
 # Actually, I don't need app here. I need to be careful with imports.
 

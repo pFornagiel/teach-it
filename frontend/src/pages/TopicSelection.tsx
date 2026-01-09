@@ -15,26 +15,22 @@ const TopicSelection: React.FC = () => {
   const [customTopic, setCustomTopic] = useState('');
 
   useEffect(() => {
-    // In a real app, we might pass the filename to get specific topics
     const fetchTopics = async () => {
       const filenames = location.state?.filenames;
-      const filename = location.state?.filename; // Fallback
-      
+      const filename = location.state?.filename;
+
       const payload = filenames ? { filenames } : { filename };
-      
+
       if (!filenames && !filename) return;
 
       try {
         const response = await fetch('http://localhost:5000/api/topics', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ filename })
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+          body: JSON.stringify(payload)
         });
         const data = await response.json();
-        setTopics(data.topics);
+        setTopics(data.topics || []);
       } catch (error) {
         console.error('Failed to fetch topics', error);
       } finally {
@@ -43,36 +39,37 @@ const TopicSelection: React.FC = () => {
     };
 
     fetchTopics();
-  }, [location.state?.filename]);
+  }, [location.state]); // depend on location.state
 
   const handleSelectTopic = async (topic: string) => {
+    const filenames = location.state?.filenames;
     const filename = location.state?.filename;
+
+    const payload = filenames ? { topic, filenames } : { topic, filename };
 
     try {
       const response = await fetch('http://localhost:5000/api/start_session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic, filename })
+        body: JSON.stringify(payload)
       });
       const data = await response.json();
-      navigate('/chat', { state: { sessionId: data.session_id, topic, filename } });
-    const filenames = location.state?.filenames; 
 
-    try {
-        const response = await fetch('http://localhost:5000/api/start_session', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ topic, filenames })
-        });
-        const data = await response.json();
-        navigate('/chat', { state: { sessionId: data.session_id, topic, filenames } });
+      navigate('/chat', {
+        state: {
+          sessionId: data.session_id,
+          topic,
+          filename,
+          filenames
+        }
+      });
     } catch (error) {
       console.error("Failed to start session", error);
     }
   };
 
   const handleViewNotes = () => {
-    navigate('/notes', { state: { filename: location.state?.filename } });
+    navigate('/notes', { state: { filename: location.state?.filename, filenames: location.state?.filenames } });
   };
 
   if (loading) {

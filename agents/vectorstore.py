@@ -1,7 +1,7 @@
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
-from loaders import load_file
+from agents.loaders import load_file
 import os
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
