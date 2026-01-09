@@ -13,7 +13,10 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-UPLOAD_FOLDER = 'uploads'
+# Use the main project uploads folder (one level up from backend)
+UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'uploads')
+if not os.path.exists(UPLOAD_FOLDER):
+    UPLOAD_FOLDER = 'uploads'  # Fallback to local folder
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -76,6 +79,17 @@ def get_notes():
             except ImportError:
                 return jsonify({'error': 'python-docx not installed'}), 500
         
+        elif file_ext == 'pdf':
+            try:
+                from PyPDF2 import PdfReader
+                reader = PdfReader(filepath)
+                text_parts = []
+                for page in reader.pages:
+                    text_parts.append(page.extract_text() or '')
+                content = '\n'.join(text_parts)
+            except ImportError:
+                return jsonify({'error': 'PyPDF2 not installed'}), 500
+        
         else:
             # Try to read as text for unknown formats
             try:
@@ -119,6 +133,9 @@ def analyze_notes():
             from docx import Document
             doc = Document(filepath)
             content = '\n'.join([para.text for para in doc.paragraphs])
+        elif file_ext == 'pdf':
+             return jsonify({'error': 'PDF files are not supported. Please convert to DOCX or TXT.'}), 400
+
         else:
             with open(filepath, 'r', encoding='utf-8') as f:
                 content = f.read()
@@ -210,6 +227,10 @@ def list_notes():
     try:
         files = []
         for filename in os.listdir(app.config['UPLOAD_FOLDER']):
+            # Skip PDF files
+            if filename.lower().endswith('.pdf'):
+                continue
+                
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             if os.path.isfile(filepath):
                 files.append({
