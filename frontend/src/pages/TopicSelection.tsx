@@ -17,14 +17,21 @@ const TopicSelection: React.FC = () => {
   useEffect(() => {
     // In a real app, we might pass the filename to get specific topics
     const fetchTopics = async () => {
-      const filename = location.state?.filename;
-      if (!filename) return;
+      const filenames = location.state?.filenames;
+      const filename = location.state?.filename; // Fallback
+      
+      const payload = filenames ? { filenames } : { filename };
+      
+      if (!filenames && !filename) return;
 
       try {
         const response = await fetch('http://localhost:5000/api/topics', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ filename })
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
         });
         const data = await response.json();
         setTopics(data.topics);
@@ -49,6 +56,16 @@ const TopicSelection: React.FC = () => {
       });
       const data = await response.json();
       navigate('/chat', { state: { sessionId: data.session_id, topic, filename } });
+    const filenames = location.state?.filenames; 
+
+    try {
+        const response = await fetch('http://localhost:5000/api/start_session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ topic, filenames })
+        });
+        const data = await response.json();
+        navigate('/chat', { state: { sessionId: data.session_id, topic, filenames } });
     } catch (error) {
       console.error("Failed to start session", error);
     }
