@@ -1,23 +1,19 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Upload, FileText, Loader2 } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
+import { Upload, Loader2 } from 'lucide-react';
+import { motion, type Variants } from 'framer-motion';
 
 const Welcome: React.FC = () => {
   const navigate = useNavigate();
-  const [file, setFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isHovering, setIsHovering] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
-    }
-  };
-
-  const handleUpload = async () => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (!file) return;
 
     setIsUploading(true);
@@ -31,10 +27,10 @@ const Welcome: React.FC = () => {
       });
 
       if (response.ok) {
-        // Wait a bit to show loading state (fake "reading" the file)
-        setTimeout(() => {
+         // Mock slight delay for effect
+         setTimeout(() => {
             navigate('/topics', { state: { filename: file.name } });
-        }, 1500);
+         }, 1500); 
       } else {
         console.error('Upload failed');
         setIsUploading(false);
@@ -45,59 +41,129 @@ const Welcome: React.FC = () => {
     }
   };
 
-  return (
-    <Layout>
-      <div className="space-y-8 text-center">
-        <blockquote className="text-2xl font-semibold italic text-muted-foreground">
-          "If you want to master something, teach it."
-        </blockquote>
-        <p className="text-sm text-muted-foreground">— Richard Feynman</p>
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15
+      }
+    }
+  };
 
-        <Card className="mx-auto max-w-md mt-10 shadow-lg border-muted/40">
-          <CardHeader>
-            <CardTitle>Start Teaching</CardTitle>
-            <CardDescription>Upload your notes to begin the session.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid w-full max-w-sm items-center gap-1.5 mx-auto">
-                <div className="flex items-center justify-center w-full">
-                    <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            {file ? (
-                                <>
-                                    <FileText className="w-8 h-8 mb-2 text-gray-500 dark:text-gray-400" />
-                                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400 font-semibold">{file.name}</p>
-                                </>
-                            ) : (
-                                <>
-                                    <Upload className="w-8 h-8 mb-2 text-gray-500 dark:text-gray-400" />
-                                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">TXT, MD, PDF (text only)</p>
-                                </>
-                            )}
-                        </div>
-                        <Input id="dropzone-file" type="file" className="hidden" onChange={handleFileChange} />
-                    </label>
+  const itemVariants: Variants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { type: 'spring', stiffness: 100 }
+    }
+  };
+
+  if (isUploading) {
+      return (
+        <Layout>
+             <div className="flex flex-col items-center justify-center space-y-6 h-[60vh]">
+                <div className="w-24 h-24 bg-secondary rounded-full border-4 border-black flex items-center justify-center animate-bounce shadow-neo">
+                    <Loader2 className="h-12 w-12 animate-spin text-black" />
+                </div>
+                <h2 className="text-3xl font-display font-bold">Uploading & Analyzing...</h2>
+                <div className="w-64 h-4 bg-gray-200 rounded-full border-2 border-black overflow-hidden relative">
+                    <motion.div 
+                        className="h-full bg-primary"
+                        initial={{ width: "0%" }}
+                        animate={{ width: "95%" }}
+                        transition={{ duration: 1.5, ease: "easeInOut" }}
+                    />
                 </div>
             </div>
+        </Layout>
+      )
+  }
 
-            <Button 
-                onClick={handleUpload} 
-                disabled={!file || isUploading} 
-                className="w-full"
-            >
-              {isUploading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processing Notes...
-                </>
-              ) : (
-                'Start Session'
-              )}
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+  return (
+    <Layout>
+      <motion.div 
+        className="space-y-12 py-8 relative min-h-[80vh] flex flex-col justify-center"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {/* Hero Section */}
+        <section className="text-center space-y-6">
+            <motion.div variants={itemVariants} className="relative z-10 max-w-4xl mx-auto">
+                <h1 className="text-5xl md:text-7xl font-display font-black leading-[0.9] text-black">
+                    If you want to master something, <span className="bg-neo-pink px-2 border-2 border-black shadow-neo-sm transform -skew-x-6 inline-block">teach it.</span>
+                </h1>
+                <p className="mt-4 text-lg font-bold font-mono uppercase tracking-widest text-muted-foreground">
+                    — Richard Feynman
+                </p>
+                
+                <p className="mt-8 text-xl md:text-2xl font-medium max-w-2xl mx-auto text-muted-foreground leading-relaxed">
+                    With <span className="font-bold text-black bg-secondary px-1 border-2 border-black">Teach.it</span>, you don't just study. You explain, you engage, and you excel. Upload your notes and let the AI challenge your understanding.
+                </p>
+            </motion.div>
+        </section>
+
+        {/* Upload Section - Regular Box (No OS Window) */}
+        <motion.div variants={itemVariants} className="max-w-xl mx-auto w-full">
+            <Card className="border-4 border-black shadow-neo-lg bg-white overflow-hidden p-8 md:p-10 hover:scale-[1.01] transition-transform duration-300">
+                <div 
+                    className={`
+                        border-4 border-dashed rounded-xl p-8 text-center transition-all duration-300 cursor-pointer
+                        flex flex-col items-center gap-4 bg-background group
+                        ${isHovering ? 'border-primary bg-primary/5' : 'border-gray-300'}
+                    `}
+                    onDragOver={(e) => { e.preventDefault(); setIsHovering(true); }}
+                    onDragLeave={() => setIsHovering(false)}
+                    onDrop={(e) => {
+                        e.preventDefault();
+                        setIsHovering(false);
+                        if (e.dataTransfer.files?.[0]) {
+                            fileInputRef.current?.click(); 
+                        }
+                    }}
+                    onClick={() => fileInputRef.current?.click()}
+                >
+                    <div className="w-16 h-16 bg-accent rounded-full border-4 border-black shadow-neo flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                            <Upload className="w-8 h-8" />
+                    </div>
+                    
+                    <div className="space-y-1">
+                        <h3 className="text-xl font-bold font-display">
+                            Upload Knowledge Base
+                        </h3>
+                        <p className="text-sm text-muted-foreground font-medium">
+                            Drag & Drop or Click to Browse
+                        </p>
+                    </div>
+
+                    <Button 
+                        className="mt-2 text-base px-6 py-4 font-black uppercase tracking-widest border-2 w-full" 
+                        variant="default"
+                    >
+                        Select File
+                    </Button>
+                    
+                    <input 
+                        type="file" 
+                        ref={fileInputRef}
+                        className="hidden" 
+                        accept=".txt,.md" 
+                        onChange={handleFileUpload}
+                    />
+                </div>
+            </Card>
+        </motion.div>
+
+        {/* Bottom Right Branding */}
+        <div className="fixed bottom-8 right-8 z-50">
+             <div className="bg-white border-2 border-black px-4 py-2 shadow-neo font-black font-display text-xl transform rotate-[-3deg] hover:rotate-0 transition-transform cursor-default">
+                Teach.it
+             </div>
+        </div>
+
+      </motion.div>
     </Layout>
   );
 };
