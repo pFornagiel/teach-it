@@ -17,14 +17,18 @@ const TopicSelection: React.FC = () => {
   useEffect(() => {
     // In a real app, we might pass the filename to get specific topics
     const fetchTopics = async () => {
-      const filename = location.state?.filename;
-      if (!filename) return;
+      const filenames = location.state?.filenames;
+      const filename = location.state?.filename; // Fallback
+      
+      const payload = filenames ? { filenames } : { filename };
+      
+      if (!filenames && !filename) return;
 
       try {
         const response = await fetch('http://localhost:5000/api/topics', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ filename })
+            body: JSON.stringify(payload)
         });
         const data = await response.json();
         setTopics(data.topics);
@@ -39,16 +43,16 @@ const TopicSelection: React.FC = () => {
   }, [location.state?.filename]);
 
   const handleSelectTopic = async (topic: string) => {
-    const filename = location.state?.filename; 
+    const filenames = location.state?.filenames; 
 
     try {
         const response = await fetch('http://localhost:5000/api/start_session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ topic, filename })
+            body: JSON.stringify({ topic, filenames })
         });
         const data = await response.json();
-        navigate('/chat', { state: { sessionId: data.session_id, topic, filename } });
+        navigate('/chat', { state: { sessionId: data.session_id, topic, filenames } });
     } catch (error) {
         console.error("Failed to start session", error);
     }
@@ -100,9 +104,6 @@ const TopicSelection: React.FC = () => {
         animate="visible"
       >
         <div className="text-center space-y-2">
-           <motion.div variants={itemVariants} className="inline-block bg-neo-green px-4 py-1 border-2 border-black shadow-neo-sm transform -rotate-1 mb-4">
-                <span className="font-bold font-mono text-sm uppercase">Step 2: Selection</span>
-           </motion.div>
           <motion.h2 variants={itemVariants} className="text-4xl md:text-5xl font-display font-black tracking-tight uppercase leading-none">
             What will you teach?
           </motion.h2>

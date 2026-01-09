@@ -79,10 +79,10 @@ const Evaluation: React.FC = () => {
   }
 
   const getGradeColor = (grade: string) => {
-    if (grade.startsWith('A')) return 'bg-neo-green text-black';
-    if (grade.startsWith('B')) return 'bg-neo-blue text-black';
-    if (grade.startsWith('C')) return 'bg-secondary text-black';
-    return 'bg-destructive text-white';
+    if (grade.startsWith('A')) return 'bg-primary text-white';
+    if (grade.startsWith('B')) return 'bg-secondary text-black';
+    if (grade.startsWith('C')) return 'bg-white text-black';
+    return 'bg-black text-white';
   }
 
   return (
@@ -143,13 +143,13 @@ const Evaluation: React.FC = () => {
                                 >
                                     <span className="font-bold text-lg font-display">{item.point}</span>
                                     <div className="flex items-center gap-2">
-                                        {item.status === 'correct' && <CheckCircle className="h-6 w-6 text-green-600 fill-green-100" />}
-                                        {item.status === 'partial' && <AlertCircle className="h-6 w-6 text-yellow-600 fill-yellow-100" />}
-                                        {item.status === 'wrong' && <AlertCircle className="h-6 w-6 text-red-600 fill-red-100" />}
+                                        {item.status === 'correct' && <CheckCircle className="h-6 w-6 text-black fill-primary" />}
+                                        {item.status === 'partial' && <AlertCircle className="h-6 w-6 text-black fill-secondary" />}
+                                        {item.status === 'wrong' && <AlertCircle className="h-6 w-6 text-white fill-black" />}
                                         <span className={cn(
                                             "capitalize font-bold px-2 py-0.5 rounded-full text-xs border border-black",
-                                            item.status === 'correct' ? "bg-green-100" :
-                                            item.status === 'partial' ? "bg-yellow-100" : "bg-red-100"
+                                            item.status === 'correct' ? "bg-primary text-white" :
+                                            item.status === 'partial' ? "bg-secondary text-black" : "bg-black text-white"
                                         )}>
                                             {item.status}
                                         </span>
