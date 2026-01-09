@@ -11,3 +11,4 @@ faiss-cpu
 pypdf
 nbformat
 pillow
+python-docx
