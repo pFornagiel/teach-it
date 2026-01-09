@@ -4,3 +4,4 @@ werkzeug
 python-dotenv
 openai
 google-generativeai
+python-docx
