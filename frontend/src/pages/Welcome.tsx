@@ -12,13 +12,15 @@ const Welcome: React.FC = () => {
   const [isHovering, setIsHovering] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const handleFiles = async (files: FileList | File[]) => {
+    if (files.length === 0) return;
 
     setIsUploading(true);
     const formData = new FormData();
-    formData.append('file', file);
+    // Append all files to FormData
+    Array.from(files).forEach(file => {
+        formData.append('file', file);
+    });
 
     try {
       const response = await fetch('http://localhost:5000/api/upload', {
@@ -31,6 +33,11 @@ const Welcome: React.FC = () => {
         setTimeout(() => {
           navigate('/topics', { state: { filename: file.name } });
         }, 1500);
+         const data = await response.json();
+         // Mock slight delay for effect
+         setTimeout(() => {
+            navigate('/topics', { state: { filenames: data.filenames } });
+         }, 1500); 
       } else {
         console.error('Upload failed');
         setIsUploading(false);
@@ -38,6 +45,12 @@ const Welcome: React.FC = () => {
     } catch (error) {
       console.error('Error uploading file:', error);
       setIsUploading(false);
+    }
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+        handleFiles(event.target.files);
     }
   };
 
@@ -103,6 +116,18 @@ const Welcome: React.FC = () => {
               With <span className="font-bold text-black bg-secondary px-1 border-2 border-black">Teach.it</span>, you don't just study. You explain, you engage, and you excel. Upload your notes and let the AI challenge your understanding.
             </p>
           </motion.div>
+            <motion.div variants={itemVariants} className="relative z-10 max-w-4xl mx-auto">
+                <h1 className="text-5xl md:text-7xl font-display font-black leading-[0.9] text-black">
+                    If you want to master something, <span className="bg-secondary px-2 border-2 border-black shadow-neo-sm transform -skew-x-6 inline-block">teach it.</span>
+                </h1>
+                <p className="mt-4 text-lg font-bold font-mono uppercase tracking-widest text-muted-foreground">
+                    — Richard Feynman
+                </p>
+                
+                <p className="mt-8 text-xl md:text-2xl font-medium max-w-2xl mx-auto text-muted-foreground leading-relaxed">
+                    With <span className="font-bold text-black bg-secondary px-1 border-2 border-black">Teach.it</span>, you don't just study. You explain, you engage, and you excel. Upload your notes and let the AI challenge your understanding.
+                </p>
+            </motion.div>
         </section>
 
         {/* Upload Section - Regular Box (No OS Window) */}
@@ -154,6 +179,47 @@ const Welcome: React.FC = () => {
               />
             </div>
           </Card>
+                    onDragOver={(e) => { e.preventDefault(); setIsHovering(true); }}
+                    onDragLeave={() => setIsHovering(false)}
+                    onDrop={(e) => {
+                        e.preventDefault();
+                        setIsHovering(false);
+                        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                            handleFiles(e.dataTransfer.files);
+                        }
+                    }}
+                    onClick={() => fileInputRef.current?.click()}
+                >
+                    <div className="w-16 h-16 bg-accent rounded-full border-4 border-black shadow-neo flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                            <Upload className="w-8 h-8" />
+                    </div>
+                    
+                    <div className="space-y-1">
+                        <h3 className="text-xl font-bold font-display">
+                            Upload Knowledge Base
+                        </h3>
+                        <p className="text-sm text-muted-foreground font-medium">
+                            Drag & Drop multiple files or Click to Browse
+                        </p>
+                    </div>
+
+                    <Button 
+                        className="mt-2 text-base px-6 py-4 font-black uppercase tracking-widest border-2 w-full" 
+                        variant="default"
+                    >
+                        Select Files
+                    </Button>
+                    
+                    <input 
+                        type="file" 
+                        ref={fileInputRef}
+                        className="hidden" 
+                        accept=".txt,.md,.pdf" 
+                        multiple
+                        onChange={handleFileUpload}
+                    />
+                </div>
+            </Card>
         </motion.div>
 
         {/* Bottom Right Branding */}
@@ -161,6 +227,9 @@ const Welcome: React.FC = () => {
           <div className="bg-white border-2 border-black px-4 py-2 shadow-neo font-black font-display text-xl transform rotate-[-3deg] hover:rotate-0 transition-transform cursor-default">
             Teach.it
           </div>
+             <div className="bg-secondary border-2 border-black px-4 py-2 shadow-neo font-display text-xl transform rotate-[-3deg] hover:rotate-0 transition-transform cursor-default">
+                Teach.it
+             </div>
         </div>
 
       </motion.div>

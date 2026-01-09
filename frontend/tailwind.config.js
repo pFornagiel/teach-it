@@ -17,18 +17,18 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "#FDFBF6", // Cream background
+        background: "#fff6e5", // Updated Cream background
         foreground: "#000000",
         primary: {
-          DEFAULT: "#8B5CF6", // Violet
+          DEFAULT: "#8B5CF6", // Purple
           foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#FDE68A", // Pastel Yellow
+          DEFAULT: "#fde68a", // Yellow
           foreground: "#000000",
         },
         accent: {
-          DEFAULT: "#FB923C", // Orange
+          DEFAULT: "#fde68a", // Yellow (Unified)
           foreground: "#000000",
         },
         muted: {
@@ -39,9 +39,6 @@ export default {
           DEFAULT: "#FFFFFF",
           foreground: "#000000",
         },
-        "neo-green": "#bef264", // Lime
-        "neo-pink": "#f9a8d4", // Pink
-        "neo-blue": "#67e8f9", // Cyan
       },
       fontFamily: {
         sans: ["Manrope", "sans-serif"],
