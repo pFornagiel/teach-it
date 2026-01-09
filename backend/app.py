@@ -1,11 +1,14 @@
 import os
 import sys
+import logging
+import base64
+import time
+import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
-import logging
-
 from dotenv import load_dotenv
+from openai import OpenAI
 
 load_dotenv()
 
@@ -17,16 +20,6 @@ from agents.student import StudentAgent
 # Configure Logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-import base64
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-from werkzeug.utils import secure_filename
-import time
-import json
-from dotenv import load_dotenv
-from openai import OpenAI
-
-load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
@@ -41,11 +34,9 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # In-memory storage for session data
 # Map session_id -> StudentAgent instance
 active_agents = {}
+
 # Initialize OpenAI client
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
-
-# In-memory storage for session data (mock persistence)
-sessions = {}
 
 # Image extensions
 IMAGE_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'}
