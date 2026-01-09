@@ -112,9 +112,7 @@ const TopicSelection: React.FC = () => {
         animate="visible"
       >
         <div className="text-center space-y-2">
-          <motion.div variants={itemVariants} className="inline-block bg-neo-green px-4 py-1 border-2 border-black shadow-neo-sm transform -rotate-1 mb-4">
-            <span className="font-bold font-mono text-sm uppercase">Step 2: Selection</span>
-          </motion.div>
+
           <motion.h2 variants={itemVariants} className="text-4xl md:text-5xl font-display font-black tracking-tight uppercase leading-none">
             What will you teach?
           </motion.h2>
