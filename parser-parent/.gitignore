@@ -1,0 +1,29 @@
+*.DS_Store
+# Environment variables (contains secrets!)
+.env
+parser/.env
+*.env*
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+# Uploads
+uploads/
+*.pdf
+*.docx
+*.csv
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+# Database
+*.db
+*.sqlite
+# Logs
+*.log
