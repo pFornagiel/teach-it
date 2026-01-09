@@ -208,7 +208,7 @@ const TeachingChat: React.FC = () => {
                                 >
                                     <Textarea 
                                         placeholder="Type your explanation..." 
-                                        className="min-h-[60px] resize-none text-base"
+                                        className="min-h-[60px] resize-none text-base bg-white"
                                         value={input}
                                         onChange={(e) => setInput(e.target.value)}
                                         onKeyDown={(e) => {

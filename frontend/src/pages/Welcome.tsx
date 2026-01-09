@@ -120,7 +120,7 @@ const Welcome: React.FC = () => {
                 <div 
                     className={`
                         border-4 border-dashed rounded-xl p-8 text-center transition-all duration-300 cursor-pointer
-                        flex flex-col items-center gap-4 bg-background group
+                        flex flex-col items-center gap-4 bg-white group
                         ${isHovering ? 'border-primary bg-primary/5' : 'border-gray-300'}
                     `}
                     onDragOver={(e) => { e.preventDefault(); setIsHovering(true); }}
