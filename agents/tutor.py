@@ -1,6 +1,7 @@
 from langchain_openai import ChatOpenAI
-from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
 
 def build_tutor(vectorstore):
     llm = ChatOpenAI(
@@ -26,9 +27,17 @@ Pytanie użytkownika:
 """
     )
 
-    return RetrievalQA.from_chain_type(
-        llm=llm,
-        retriever=vectorstore.as_retriever(search_kwargs={"k": 5}),
-        chain_type_kwargs={"prompt": prompt},
-        return_source_documents=True
+    retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
+
+    def format_docs(docs):
+        return "\n\n".join(doc.page_content for doc in docs)
+
+    # Nowoczesny łańcuch LCEL zastępujący RetrievalQA
+    chain = (
+        {"context": retriever | format_docs, "question": RunnablePassthrough()}
+        | prompt
+        | llm
+        | StrOutputParser()
     )
+
+    return chain
