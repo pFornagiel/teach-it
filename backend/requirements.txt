@@ -4,4 +4,11 @@ werkzeug
 python-dotenv
 openai
 google-generativeai
+langchain
+langchain-openai
+langchain-community
+faiss-cpu
+pypdf
+nbformat
+pillow
 python-docx
