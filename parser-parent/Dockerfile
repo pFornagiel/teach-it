@@ -20,7 +20,7 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 COPY requirements.txt .
 
 # Install Python dependencies using uv (much faster than pip)
-RUN uv pip install --system --no-cache -r requirements.txt
+RUN pip install  -r requirements.txt
 # Copy application code
 COPY parser/ .
 # Create uploads directory
