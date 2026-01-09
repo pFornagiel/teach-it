@@ -103,7 +103,7 @@ const Welcome: React.FC = () => {
         <section className="text-center space-y-6">
           <motion.div variants={itemVariants} className="relative z-10 max-w-4xl mx-auto">
             <h1 className="text-5xl md:text-7xl font-display font-black leading-[0.9] text-black">
-              If you want to master something, <span className="bg-neo-pink px-2 border-2 border-black shadow-neo-sm transform -skew-x-6 inline-block">teach it.</span>
+              If you want to master something, <span className="bg-secondary px-2 border-2 border-black shadow-neo-sm transform -skew-x-6 inline-block">teach it.</span>
             </h1>
             <p className="mt-4 text-lg font-bold font-mono uppercase tracking-widest text-muted-foreground">
               — Richard Feynman
@@ -123,7 +123,7 @@ const Welcome: React.FC = () => {
             <div
               className={`
                 border-4 border-dashed rounded-xl p-8 text-center transition-all duration-300 cursor-pointer
-                flex flex-col items-center gap-4 bg-background group
+                flex flex-col items-center gap-4 bg-white group
                 ${isHovering ? 'border-primary bg-primary/5' : 'border-gray-300'}
               `}
               onDragOver={(e) => { e.preventDefault(); setIsHovering(true); }}
@@ -161,7 +161,7 @@ const Welcome: React.FC = () => {
                 type="file"
                 ref={fileInputRef}
                 className="hidden"
-                accept=".txt,.md,.csv,.docx,.jpg,.jpeg,.png,.gif,.webp"
+
                 multiple
                 onChange={handleFileUpload}
               />
@@ -171,7 +171,7 @@ const Welcome: React.FC = () => {
 
         {/* Bottom Right Branding */}
         <div className="fixed bottom-8 right-8 z-50">
-          <div className="bg-white border-2 border-black px-4 py-2 shadow-neo font-black font-display text-xl transform rotate-[-3deg] hover:rotate-0 transition-transform cursor-default">
+          <div className="bg-secondary border-2 border-black px-4 py-2 shadow-neo font-normal font-display text-xl transform rotate-[-3deg] hover:rotate-0 transition-transform cursor-default">
             Teach.it
           </div>
         </div>
