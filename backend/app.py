@@ -16,22 +16,27 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 sessions = {}
 
 @app.route('/api/upload', methods=['POST'])
+@app.route('/api/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
-    file = request.files['file']
-    if file.filename == '':
+    
+    files = request.files.getlist('file')
+    if not files or files[0].filename == '':
         return jsonify({'error': 'No selected file'}), 400
     
-    if file:
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(filepath)
-        
-        # Mocking "processing" time
-        time.sleep(1)
-        
-        return jsonify({'message': 'File uploaded successfully', 'filename': filename}), 200
+    saved_filenames = []
+    for file in files:
+        if file:
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+            saved_filenames.append(filename)
+    
+    # Mocking "processing" time
+    time.sleep(1)
+    
+    return jsonify({'message': 'Files uploaded successfully', 'filenames': saved_filenames}), 200
 
 @app.route('/api/topics', methods=['POST'])
 def get_topics():
@@ -52,12 +57,12 @@ def get_topics():
 def start_session():
     data = request.json
     topic = data.get('topic')
-    filename = data.get('filename') # Kept for interface consistency
+    filenames = data.get('filenames') # List of filenames
     session_id = f"session_{int(time.time())}"
     
     sessions[session_id] = {
         'topic': topic,
-        'filename': filename,
+        'filenames': filenames,
         'questions_asked': 0,
         'target_questions': 3,
         'history': [],

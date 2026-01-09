@@ -12,13 +12,15 @@ const Welcome: React.FC = () => {
   const [isHovering, setIsHovering] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const handleFiles = async (files: FileList | File[]) => {
+    if (files.length === 0) return;
 
     setIsUploading(true);
     const formData = new FormData();
-    formData.append('file', file);
+    // Append all files to FormData
+    Array.from(files).forEach(file => {
+        formData.append('file', file);
+    });
 
     try {
       const response = await fetch('http://localhost:5000/api/upload', {
@@ -27,9 +29,10 @@ const Welcome: React.FC = () => {
       });
 
       if (response.ok) {
+         const data = await response.json();
          // Mock slight delay for effect
          setTimeout(() => {
-            navigate('/topics', { state: { filename: file.name } });
+            navigate('/topics', { state: { filenames: data.filenames } });
          }, 1500); 
       } else {
         console.error('Upload failed');
@@ -38,6 +41,12 @@ const Welcome: React.FC = () => {
     } catch (error) {
       console.error('Error uploading file:', error);
       setIsUploading(false);
+    }
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+        handleFiles(event.target.files);
     }
   };
 
@@ -93,7 +102,7 @@ const Welcome: React.FC = () => {
         <section className="text-center space-y-6">
             <motion.div variants={itemVariants} className="relative z-10 max-w-4xl mx-auto">
                 <h1 className="text-5xl md:text-7xl font-display font-black leading-[0.9] text-black">
-                    If you want to master something, <span className="bg-neo-pink px-2 border-2 border-black shadow-neo-sm transform -skew-x-6 inline-block">teach it.</span>
+                    If you want to master something, <span className="bg-secondary px-2 border-2 border-black shadow-neo-sm transform -skew-x-6 inline-block">teach it.</span>
                 </h1>
                 <p className="mt-4 text-lg font-bold font-mono uppercase tracking-widest text-muted-foreground">
                     — Richard Feynman
@@ -119,8 +128,8 @@ const Welcome: React.FC = () => {
                     onDrop={(e) => {
                         e.preventDefault();
                         setIsHovering(false);
-                        if (e.dataTransfer.files?.[0]) {
-                            fileInputRef.current?.click(); 
+                        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                            handleFiles(e.dataTransfer.files);
                         }
                     }}
                     onClick={() => fileInputRef.current?.click()}
@@ -134,7 +143,7 @@ const Welcome: React.FC = () => {
                             Upload Knowledge Base
                         </h3>
                         <p className="text-sm text-muted-foreground font-medium">
-                            Drag & Drop or Click to Browse
+                            Drag & Drop multiple files or Click to Browse
                         </p>
                     </div>
 
@@ -142,14 +151,15 @@ const Welcome: React.FC = () => {
                         className="mt-2 text-base px-6 py-4 font-black uppercase tracking-widest border-2 w-full" 
                         variant="default"
                     >
-                        Select File
+                        Select Files
                     </Button>
                     
                     <input 
                         type="file" 
                         ref={fileInputRef}
                         className="hidden" 
-                        accept=".txt,.md" 
+                        accept=".txt,.md,.pdf" 
+                        multiple
                         onChange={handleFileUpload}
                     />
                 </div>
@@ -158,7 +168,7 @@ const Welcome: React.FC = () => {
 
         {/* Bottom Right Branding */}
         <div className="fixed bottom-8 right-8 z-50">
-             <div className="bg-white border-2 border-black px-4 py-2 shadow-neo font-black font-display text-xl transform rotate-[-3deg] hover:rotate-0 transition-transform cursor-default">
+             <div className="bg-secondary border-2 border-black px-4 py-2 shadow-neo font-display text-xl transform rotate-[-3deg] hover:rotate-0 transition-transform cursor-default">
                 Teach.it
              </div>
         </div>
