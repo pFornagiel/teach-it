@@ -59,11 +59,23 @@ def start_session():
         'topic': topic,
         'filename': filename,
         'questions_asked': 0,
+        'target_questions': 3,
         'history': [],
         'scores': []
     }
     
     return jsonify({'session_id': session_id}), 200
+
+@app.route('/api/continue_session', methods=['POST'])
+def continue_session():
+    data = request.json
+    session_id = data.get('session_id')
+    
+    if session_id not in sessions:
+        return jsonify({'error': 'Session not found'}), 404
+        
+    sessions[session_id]['target_questions'] += 3
+    return jsonify({'message': 'Session extended'}), 200
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
@@ -84,7 +96,7 @@ def chat():
         session['scores'].append("A" if len(user_answer) > 10 else "C")
     
     # Check if we should end or continue
-    if session['questions_asked'] >= 3:
+    if session['questions_asked'] >= session.get('target_questions', 3):
         return jsonify({
             'finished': True,
             'message': 'Good job! Ready for evaluation?'
@@ -92,15 +104,18 @@ def chat():
     
     # Generate next question (Mock)
     topic = session['topic']
-    questions = [
+    base_questions = [
         f"Explain the first concept of {topic}.",
         f"How does {topic} relate to everyday life?",
-        f"What is the most critical part of {topic}?"
+        f"What is the most critical part of {topic}?",
+        f"Can you give an example of {topic} in action?",
+        f"What are common misconceptions about {topic}?",
+        f"How would you explain {topic} to a 5 year old?"
     ]
     
-    # Cycle through questions if we go beyond 3 for some reason, or just pick the next one
-    idx = session['questions_asked']
-    next_question = questions[idx] if idx < len(questions) else "Any final thoughts?"
+    # Cyclic question selection
+    idx = session['questions_asked'] % len(base_questions)
+    next_question = base_questions[idx]
     
     session['history'].append({'role': 'assistant', 'content': next_question})
     
