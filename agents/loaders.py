@@ -1,6 +1,9 @@
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
-from langchain.schema import Document
-import pytesseract
+from langchain_core.documents import Document
+try:
+    import pytesseract
+except ImportError:
+    pytesseract = None
 from PIL import Image
 import nbformat
 import os
@@ -9,11 +12,19 @@ def load_file(path: str) -> list[Document]:
     ext = os.path.splitext(path)[1].lower()
 
     if ext == ".pdf":
-        return PyPDFLoader(path).load()
+        print(f"INFO: Skipping PDF file {path} as it is not supported.")
+        return []
 
-    if ext in [".jpg", ".png"]:
-        text = pytesseract.image_to_string(Image.open(path))
-        return [Document(page_content=text, metadata={"source": path})]
+    if ext in [".jpg", ".png", ".jpeg"]:
+        if pytesseract is None:
+            print(f"WARNING: pytesseract not installed. Skipping image {path}")
+            return []
+        try:
+            text = pytesseract.image_to_string(Image.open(path))
+            return [Document(page_content=text, metadata={"source": path})]
+        except Exception as e:
+            print(f"WARNING: Failed to process image {path} with OCR: {e}")
+            return []
 
     if ext == ".ipynb":
         nb = nbformat.read(path, as_version=4)
