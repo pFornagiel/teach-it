@@ -1,2 +1,1 @@
 # Hackaton
-contributing to repo
