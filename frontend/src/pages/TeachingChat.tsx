@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Loader2, Send, Bot, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Message {
   role: 'assistant' | 'user';
@@ -15,7 +16,7 @@ interface Message {
 const TeachingChat: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { sessionId, topic } = location.state || {};
+  const { sessionId, topic, filename } = location.state || {};
   
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -77,15 +78,8 @@ const TeachingChat: React.FC = () => {
         const data = await response.json();
 
         if (data.finished) {
-            // Ask user if they want to continue or evaluate
-            const finishMsg: Message = { role: 'assistant', content: data.message };
-            setMessages([...newMessages, finishMsg]);
-            
-            // For now, we auto-redirect to evaluation after a short delay or show a button
-            // But per specs: "prompt whether he wants to teach more or evaluate"
-            // Let's mock this by showing buttons in the UI instead of text input for the last step
-            // For MVP simplicity, let's just show an "Evaluation Ready" state
-            
+             const finishMsg: Message = { role: 'assistant', content: data.message };
+             setMessages([...newMessages, finishMsg]);
         } else {
             setMessages([...newMessages, { role: 'assistant', content: data.question }]);
         }
@@ -99,72 +93,125 @@ const TeachingChat: React.FC = () => {
   const isFinished = messages.length > 0 && messages[messages.length - 1].content.includes("Ready for evaluation");
 
   const handleGoToEvaluation = () => {
-    navigate('/evaluate', { state: { sessionId } });
+    navigate('/evaluate', { state: { sessionId, filename } });
+  };
+
+  const handleTeachMore = async () => {
+    try {
+        await fetch('http://localhost:5000/api/continue_session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: sessionId })
+        });
+        
+        // Fetch next question
+        const response = await fetch('http://localhost:5000/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: sessionId })
+        });
+        const data = await response.json();
+        
+        setMessages(prev => [...prev, { role: 'assistant', content: data.question }]);
+        
+    } catch (error) {
+        console.error("Failed to extend session", error);
+    }
   };
 
   return (
     <Layout>
-      <div className="flex flex-col h-[80vh]">
-        <div className="text-center mb-4">
-            <h2 className="text-xl font-semibold">Teaching: {topic}</h2>
-            <p className="text-sm text-muted-foreground">Explain the concepts clearly to your virtual friend.</p>
-        </div>
+      <div className="flex flex-col h-[85vh] max-w-3xl mx-auto w-full">
+        <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-6"
+        >
+            <div className="inline-block p-3 bg-secondary border-2 border-black shadow-neo transform -rotate-2 mb-2">
+                <h2 className="text-xl font-bold uppercase tracking-tight">Topic: {topic}</h2>
+            </div>
+            <p className="text-sm font-medium text-muted-foreground mt-2 bg-white inline-block px-2 py-1 border-2 border-black shadow-neo-sm">TEACH THE AI</p>
+        </motion.div>
 
-        <Card className="flex-1 flex flex-col overflow-hidden shadow-md border-muted/60">
-            <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
+        <Card className="flex-1 flex flex-col overflow-hidden border-2 border-black shadow-neo bg-white relative">
+            <CardContent className="flex-1 overflow-y-auto p-4 space-y-6">
                 {messages.map((msg, idx) => (
-                    <div key={idx} className={cn("flex w-full", msg.role === 'user' ? "justify-end" : "justify-start")}>
+                    <motion.div 
+                        key={idx} 
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className={cn("flex w-full", msg.role === 'user' ? "justify-end" : "justify-start")}
+                    >
                         <div className={cn(
-                            "flex max-w-[80%] rounded-lg p-3 text-sm",
+                            "flex max-w-[80%] rounded-lg p-4 text-sm font-medium border-2 border-black shadow-neo-sm",
                             msg.role === 'user' 
-                                ? "bg-primary text-primary-foreground" 
-                                : "bg-muted text-foreground"
+                                ? "bg-primary text-white" 
+                                : "bg-secondary text-black"
                         )}>
-                            {msg.role === 'assistant' && <Bot className="mr-2 h-4 w-4 mt-1 flex-shrink-0" />}
-                            {msg.role === 'user' && <User className="mr-2 h-4 w-4 mt-1 flex-shrink-0" />}
+                            {msg.role === 'assistant' && <Bot className="mr-3 h-5 w-5 mt-0.5 flex-shrink-0" />}
+                            {msg.role === 'user' && <User className="mr-3 h-5 w-5 mt-0.5 flex-shrink-0" />}
                             <div className="leading-relaxed">{msg.content}</div>
                         </div>
-                    </div>
+                    </motion.div>
                 ))}
                 {isLoading && (
-                    <div className="flex justify-start w-full">
-                         <div className="flex max-w-[80%] rounded-lg p-3 bg-muted">
-                            <Bot className="mr-2 h-4 w-4 mt-1" />
-                            <Loader2 className="h-4 w-4 animate-spin" />
+                    <motion.div 
+                        initial={{ opacity: 0 }} 
+                        animate={{ opacity: 1 }}
+                        className="flex justify-start w-full"
+                    >
+                         <div className="flex max-w-[80%] rounded-lg p-4 bg-muted border-2 border-black shadow-neo-sm">
+                            <Bot className="mr-3 h-5 w-5 mt-0.5" />
+                            <Loader2 className="h-5 w-5 animate-spin" />
                         </div>
-                    </div>
+                    </motion.div>
                 )}
                 <div ref={scrollRef} />
             </CardContent>
-            <CardFooter className="p-4 bg-background border-t">
-                {isFinished ? (
-                     <div className="w-full flex gap-4">
-                        <Button variant="outline" className="w-full" onClick={() => window.location.reload()}>
-                            Teach More
-                        </Button>
-                        <Button className="w-full" onClick={handleGoToEvaluation}>
-                            See Evaluation
-                        </Button>
-                     </div>
-                ) : (
-                    <div className="flex w-full items-end gap-2">
-                        <Textarea 
-                            placeholder="Type your explanation..." 
-                            className="min-h-[60px]"
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && !e.shiftKey) {
-                                    e.preventDefault();
-                                    handleSend();
-                                }
-                            }}
-                        />
-                        <Button size="icon" onClick={handleSend} disabled={!input.trim() || isLoading}>
-                            <Send className="h-4 w-4" />
-                        </Button>
-                    </div>
-                )}
+            
+            <CardFooter className="p-4 bg-background border-t-2 border-black">
+                <AnimatePresence mode="wait">
+                    {isFinished ? (
+                         <motion.div 
+                            key="finished-controls"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 20 }}
+                            className="w-full flex gap-4"
+                         >
+                            <Button variant="outline" className="w-full bg-white hover:bg-gray-100" onClick={handleTeachMore}>
+                                Teach More
+                            </Button>
+                            <Button className="w-full bg-accent text-black hover:bg-accent/90" onClick={handleGoToEvaluation}>
+                                See Evaluation
+                            </Button>
+                         </motion.div>
+                    ) : (
+                        <motion.div 
+                            key="input-controls"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 20 }}
+                            className="flex w-full items-end gap-2"
+                        >
+                            <Textarea 
+                                placeholder="Type your explanation..." 
+                                className="min-h-[60px] resize-none text-base"
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleSend();
+                                    }
+                                }}
+                            />
+                            <Button size="icon" onClick={handleSend} disabled={!input.trim() || isLoading} className="h-[60px] w-[60px]">
+                                <Send className="h-6 w-6" />
+                            </Button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </CardFooter>
         </Card>
       </div>
