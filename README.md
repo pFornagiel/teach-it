@@ -96,10 +96,10 @@ Instead of passively reading notes, users upload their documents, and the system
 
 ## 👥 Contributors
 
-*   **Massny**
-*   **Maciej Wiśniewski (macwsn)**
-*   **Hbrtjm**
-*   **radbene**
+*   [**pFornagiel**](https://github.com/pFornagiel/)
+*   [**macwsn**](https://github.com/macwsn)
+*   [**Hbrtjm**](https://github.com/Hbrtjm)
+*   [**radbene**](https://github.com/radbene)
 
 ---
 *Created for Upside Hackathon 2025*
