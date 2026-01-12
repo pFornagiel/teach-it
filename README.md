@@ -8,9 +8,17 @@ Even as a prototype, it landed well with the judges and ended up winning the com
 
 ### Platform Description
 
+<br />
+<p align="center">
+<img width="95%" alt="image" src="https://github.com/user-attachments/assets/18eb073b-d7c9-4901-af04-c4c5e9e3b533" />
+</p>
+<br />
+
 **Teach.it** is an interactive AI-powered educational platform designed to transform static study materials into dynamic tutoring sessions.
 
 Instead of passively reading notes, users upload their documents, and the system acts as a **Socratic Tutor**. It extracts key topics, engages the user in a dialogue to test understanding, and provides comprehensive evaluations.
+
+
 
 ### Key Features
 *   **📄 Smart Document Analysis**: Upload PDF, DOCX, or TXT files. The system analyzes the content to extract "learnable" topics.
@@ -19,7 +27,7 @@ Instead of passively reading notes, users upload their documents, and the system
 
 ## 🎥 Demo
 
-![App Demo](assets/demo.webp)
+https://github.com/user-attachments/assets/6e8bb33c-cc35-47ae-ac0a-783088bbbf63
 
 ## 🛠 Technologies
 
