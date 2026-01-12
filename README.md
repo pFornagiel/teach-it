@@ -1,5 +1,13 @@
 # Teach.it - AI Tutoring Platform 🎓
 
+### About the project
+
+This repository hosts an e-learning platform prototype built during the Upside Hackathon. The whole codebase was put together in under five hours, to support the final pitch. It is heavily vibe-coded and chaotic at times, but it was fun to try and shape a full system from the concept to final product in that limited time.
+
+Even as a prototype, it landed well with the judges and ended up winning the competition. What lies below is a short description of out efforts and a small showcase.
+
+### Platform Description
+
 **Teach.it** is an interactive AI-powered educational platform designed to transform static study materials into dynamic tutoring sessions.
 
 Instead of passively reading notes, users upload their documents, and the system acts as a **Socratic Tutor**. It extracts key topics, engages the user in a dialogue to test understanding, and provides comprehensive evaluations.
