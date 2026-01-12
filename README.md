@@ -2,9 +2,9 @@
 
 ### About the project
 
-This repository hosts an e-learning platform prototype built during the Upside Hackathon. The whole codebase was put together in under five hours, to support the final pitch. It is heavily vibe-coded and chaotic at times, but it was fun to try and shape a full system from the concept to final product in that limited time.
+This repository hosts an e-learning platform prototype built during the Upside Hackathon. The whole codebase was put together in under five hours to support the final pitch. It is, admittedly, heavily vibe-coded and chaotic at times, but it was fun trying to shape a full system from concept to something demo-ready in such a short time.
 
-Even as a prototype, it landed well with the judges and ended up winning the competition. What lies below is a short description of out efforts and a small showcase.
+Even as a prototype, it landed well with the judges and ended up winning the competition. Below is a short description of our efforts, along with a small showcase.
 
 ### Platform Description
 
