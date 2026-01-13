@@ -115,4 +115,4 @@ https://github.com/user-attachments/assets/6e8bb33c-cc35-47ae-ac0a-783088bbbf63
 *   [**radbene**](https://github.com/radbene)
 
 ---
-*Created for Upside Hackathon 2025*
+*Created for Upside Hackathon 2026*
